@@ -35,6 +35,12 @@ A massive ancient Greek world built entirely in code with three.js. There are no
 | Tokens | ~11M output tokens, ~3.8B cache-read tokens, ~161M cache-write tokens |
 | API-equivalent cost | ~$1.8k to $2.3k at Opus 5.5 API prices (actually run on a Claude Max subscription) |
 
+## References
+
+The 9 AI-generated reference images the world was built to match are in [`refs/`](refs). Left: reference, right: final 4K render.
+
+![reference vs render](media/reference_vs_render.jpg)
+
 ## How it was made
 
 The whole session prompt is in [docs/PROMPT.md](docs/PROMPT.md).
@@ -72,6 +78,6 @@ node tools/render-video.mjs --w 1920 --h 1080 --spp 8 --quality high
 
 Built with Claude Code (Claude Opus 5.5) and [three.js](https://threejs.org).
 
-Music in the showcase video: "Ascending the Vale" by Kevin MacLeod (incompetech.com), licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/). The music and the 9 reference images are not part of this repository.
+Music in the showcase video: "Ascending the Vale" by Kevin MacLeod (incompetech.com), licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/). The music is not part of this repository.
 
 MIT licensed.
