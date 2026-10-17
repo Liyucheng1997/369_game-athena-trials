@@ -1,0 +1,13 @@
+node_modules/
+out/
+snapshots/
+audio/
+refs/
+*.log
+.DS_Store
+Thumbs.db
+
+# baked geometry is regenerable (node tools/bake.mjs terrain|head|statues), except keep the
+# eroded mountain grid so the mountains look exactly like the renders without a rebake
+generated/*
+!generated/terrain-far-v11.bin
