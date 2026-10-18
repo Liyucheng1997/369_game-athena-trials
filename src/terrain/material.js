@@ -322,8 +322,14 @@ scree = mix(scree, scrub, smoothstep(-0.1, 0.5, mC + 0.3 * mB) * 0.7);
 g = mix(g, scree, smoothstep(0.12, 0.30, slope) * smoothstep(0.62, 0.42, slope) * (1.0 - fw));
 rockW = max(rockW, smoothstep(0.05, 0.45, outc));
 float alt = smoothstep(250.0, 1400.0, P.y);
+// (perf) the rock layer only where it has weight: as rock (rockW) or emerging from the water (emerg below);
+// skipping zero-weight work leaves the image unchanged
+float emergPre = smoothstep(-2.0, -7.0, wd) * smoothstep(2.5, 1.2, P.y) * (1.0 - fw);
+vec3 rc = vec3(0.5); float cvegH = 0.0;
+tlAlb = vec3(0.5); tlH = 0.0; tlRgh = 0.9; tlAO = 1.0; tlN = N;
+if (rockW > 0.0 || emergPre > 0.0) {
 tLime(P, N, cav, fp);
-vec3 rc = tlAlb * uRockTint;
+rc = tlAlb * uRockTint;
 float ledge = smoothstep(0.55, 0.85, N.y) * rockW * smoothstep(400.0, 0.0, P.y);
 rc = mix(rc, mix(scrub, greenG, 0.4 + 0.3 * mC), clamp(ledge * (0.55 + 0.6 * mC), 0.0, 0.85));
 // deep fissures: dark, damp, a hint of green-black growth
@@ -339,10 +345,11 @@ float cvegW = smoothstep(0.22 + 0.30 * cvegD, 0.48 + 0.30 * cvegD, cveg + 0.15 *
 float leaf = 0.55 + 0.9 * smoothstep(-0.5, 0.75, cgSnoise(P * 2.6 + 1.0) * (1.0 - smoothstep(0.08, 0.4, fp)) + 0.35 * blob);
 vec3 cvegC = mix(scrub * 1.7, greenG * 1.3, smoothstep(-0.3, 0.6, mC + 0.3 * blob)) * leaf;
 rc = mix(rc, cvegC, cvegW * 0.92);
-float cvegH = cvegW * 0.12 * blob * (1.0 - smoothstep(0.08, 0.3, fp));
+cvegH = cvegW * 0.12 * blob * (1.0 - smoothstep(0.08, 0.3, fp));
 // iron/ochre stains and dark water streaks below ledges (mid distance)
 float ochre = smoothstep(0.35, 0.8, stFbm(vec3(P.x * 0.05, P.y * 0.012, P.z * 0.05) + 13.0, 3, 0.0, 0.5));
 rc = mix(rc, rc * vec3(1.22, 0.90, 0.60), ochre * 0.55 * (1.0 - alt) * (1.0 - fw));
+}
 vec3 col = mix(g, rc, rockW);
 float hgt = mix(gH, tlH + cvegH, rockW);
 tN = normalize(mix(tN, tlN, rockW * (1.0 - fw)));
@@ -369,6 +376,8 @@ col = mix(col, mix(vec3(0.20, 0.19, 0.15), vec3(0.11, 0.12, 0.08), smoothstep(0.
 
 // ---------------- far mountains (alpine range): rock faces, strata, couloirs, scree, forest, meadows, snow
 // vertical streak fields (triplanar on the two vertical planes): couloirs / rock ribs / water streaks
+// (perf) the whole far-field block only where it has weight (fw > 0); identical image otherwise
+if (fw > 0.0) {
 vec3 Nfc = N;
 if (fw > 0.001) { Nfc = tFacetN(P, N, fp, 46.0, 0.55, 0.0); Nfc = tFacetN(P, Nfc, fp, 15.0, 0.45, 17.0); }
 float slopeF = 1.0 - clamp(Nfc.y, 0.0, 1.0);
@@ -450,6 +459,7 @@ rough = mix(rough, farRough, fw);
 ao = mix(ao, 1.0 - 0.25 * smoothstep(0.3, 2.5, cv), fw);
 // lighting normal: rock facets (snow drapes them more smoothly, forest canopy is its own texture)
 tN = normalize(mix(tN, mix(Nfc, normalize(Nfc + 2.0 * N), 0.85 * snowF), fw * (1.0 - 0.85 * forW) * (1.0 - 0.6 * medW)));
+}
 
 diffuseColor.rgb = max(col, vec3(0.0));
 if (uTDebug > 0.5) { diffuseColor.rgb = vec3(0.5); ao = 1.0; }

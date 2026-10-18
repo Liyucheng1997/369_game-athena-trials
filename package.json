@@ -1,11 +1,12 @@
 {
-  "name": "athenaion",
+  "name": "trials-of-athena",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "serve": "node tools/serve.mjs",
-    "render": "node tools/render.mjs"
+    "render": "node tools/render.mjs",
+    "game": "node tools/serve.mjs"
   },
   "dependencies": {
     "pngjs": "^7.0.0",

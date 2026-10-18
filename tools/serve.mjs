@@ -28,7 +28,8 @@ export function startServer(port = 0, root = ROOT) {
     try {
       const url = new URL(req.url, 'http://x');
       let p = decodeURIComponent(url.pathname);
-      if (p === '/') p = '/index.html';
+      // "/" opens the game; viewer URLs (/?shot=3, /?test=…, /?mode=…) keep opening the original viewer
+      if (p === '/') p = ['shot', 'test', 'mode'].some((k) => url.searchParams.has(k)) ? '/index.html' : '/game.html';
       const file = path.normalize(path.join(root, p));
       if (!file.startsWith(root)) { res.writeHead(403); res.end(); return; }
       fs.stat(file, (err, st) => {
@@ -53,5 +54,9 @@ export function startServer(port = 0, root = ROOT) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const port = Number(process.argv[2] || 8080);
-  startServer(port).then(({ port }) => console.log(`Serving ${ROOT} at http://localhost:${port}/`));
+  startServer(port).then(({ port }) => {
+    console.log(`Serving ${ROOT}`);
+    console.log(`  游戏 / game:     http://localhost:${port}/`);
+    console.log(`  原版场景 viewer: http://localhost:${port}/index.html?shot=1`);
+  });
 }

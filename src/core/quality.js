@@ -21,6 +21,14 @@ export const QUALITY = {
     terrainRes: 1.0, density: 1.0, detail: 1.0,
     cloudSteps: 64, bloom: true, ao: true,
   },
+  // real-time game (src/game): preview content, tighter shadow range (crisper near the hero), the terrain is
+  // meshed for the whole playable area (terrainMesh 'game', see terrain/meshgeo.js PLAN_OPTS)
+  game: {
+    name: 'preview', game: true, terrainMesh: 'game', spp: 1, msaa: 4,
+    shadowMapSize: 2048, cascades: 2, shadowMaxFar: 300, softShadows: false,
+    terrainRes: 0.5, density: 0.45, detail: 0.5,
+    cloudSteps: 16, bloom: true, ao: false,
+  },
 };
 
 export function getQuality(name) { return { ...(QUALITY[name] || QUALITY.preview) }; }

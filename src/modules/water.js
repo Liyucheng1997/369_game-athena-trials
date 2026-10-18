@@ -69,7 +69,8 @@ export async function build(engine) {
 
   // ---- flow field, ripple tile, reflection
   const flow = buildFlowMap({ bounds: FLOW_BOUNDS, res: q.detail >= 1 ? 420 : 300, depthAt, impacts });
-  const ocean = new OceanTile({ n: 256, size: 24, wind: 4.2, windDir: 0.9, seed: 11 });
+  // (game) the real-time preset uses a 128² tile updated at ~20 Hz: the CPU FFT is the costliest per-frame update
+  const ocean = new OceanTile({ n: q.game ? 128 : 256, size: 24, wind: 4.2, windDir: 0.9, seed: 11 });
   const reflection = new PlanarReflection(engine, { level, scale: q.name === 'preview' ? 0.5 : 0.75 });
 
   const water = createWaterSurface(engine, { maps, flow, ocean, reflection, level });
@@ -77,7 +78,7 @@ export async function build(engine) {
   engine.add(water.group, { castShadow: false, receiveShadow: true });
 
   engine.onUpdate((t) => {
-    ocean.update(t);
+    if (!q.game || Math.abs(t - (ocean.time ?? -1)) > 0.05) ocean.update(t);
     water.uniforms.uTime.value = t;
   });
   // look-dev: a shot object may carry { waterDebug: n, waterTune: { uniform: value | [x,y,z,w] } }

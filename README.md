@@ -1,83 +1,64 @@
-# Athenaion
+# 雅典娜之试炼 · Trials of Athena
 
-A massive ancient Greek world built entirely in code with three.js. There are no external assets: every mesh, texture, shader, tree, statue and waterfall is generated procedurally. Claude Code (Opus 5.5) built it over about 2 days to match 9 reference images, and it was rendered in 4K on an integrated laptop GPU (AMD Radeon 780M).
+一款运行在浏览器里的古希腊动作冒险游戏，玩法类似《塞尔达传说：旷野之息》：攀爬一切、乘风滑翔、剑盾战斗、寻回圣物、挑战米诺陶洛斯。
 
-![teaser](media/teaser.gif)
+游戏建立在 [Athenaion](https://github.com/Leonxlnx/athenaion)（Leonxlnx 用 three.js 完全程序化生成的古希腊世界，MIT 协议）之上。
+世界、角色、怪物、道具、音效和音乐**全部由代码生成，没有任何外部素材**。
 
-![all shots](media/overview.jpg)
-
-## What's in it
-
-- An acropolis on a limestone cliff massif with terraces, retaining walls, a podium and a grand stair
-- A Parthenon-style Doric temple with gilded acroteria, sculpted pediments, metopes and owl banners
-- Colossal Athena statues and dozens of smaller statues, all sculpted as signed distance fields and meshed
-- 57 traced waterfalls with spray, mist and foam, plus a lagoon, a river with rapids and a sea with planar reflections
-- Aqueducts and bridges, a city of procedural houses, a harbour with ships, a tholos on an island
-- 149k cypress, olive, pine and broadleaf trees and shrubs, with ivy, grass and flowers
-- An eroded snowy mountain range, volumetric clouds, cloud banks and aerial perspective
-- A giant fallen marble head and a ruined portico in the foreground
-- An offline renderer with jittered accumulation (AA, soft shadows, motion blur), AgX tone mapping, local tone mapping, bloom and colour grading
+*A Zelda-like action adventure built on top of the procedural ancient Greek world [Athenaion](https://github.com/Leonxlnx/athenaion). Climb anything, glide, fight with sword and shield, recover three relics and face the Minotaur — everything is generated in code.*
 
 | | |
 |---|---|
-| ![](media/shot5.jpg) | ![](media/shot2.jpg) |
-| ![](media/shot4.jpg) | ![](media/shot8.jpg) |
+| ![滑翔](media/game/glide.jpg) | ![攀爬](media/game/climb.jpg) |
+| ![米诺陶洛斯](media/game/boss.jpg) | ![龙牙骷髅兵](media/game/spartoi.jpg) |
 
-## Numbers
+## 快速开始
 
-| | |
-|---|---|
-| Total time | ~45 h wall clock (Oct 16, 03:36 to Oct 18, 00:34) |
-| Building and iterating | ~27 h across 9 multi-agent rounds |
-| Agents | 55 subagents (up to 12 in parallel), ~147 agent-hours |
-| Final rendering | 4K stills plus a 54 s 4K 30fps video, ~13 h of GPU rendering |
-| Code | ~45k lines of JavaScript in 168 modules |
-| Tokens | ~11M output tokens, ~3.8B cache-read tokens, ~161M cache-write tokens |
-| API-equivalent cost | ~$1.8k to $2.3k at Opus 5.5 API prices (actually run on a Claude Max subscription) |
-
-## References
-
-The 9 AI-generated reference images the world was built to match are in [`refs/`](refs). Left: reference, right: final 4K render.
-
-![reference vs render](media/reference_vs_render.jpg)
-
-## How it was made
-
-The whole session prompt is in [docs/PROMPT.md](docs/PROMPT.md).
-
-1. Claude Code wrote the engine first: the render harness, atmosphere, sky, shadows and the accumulation pipeline.
-2. It wrote an art bible and module contract (`docs/`), then ran 12 specialist agents in parallel: terrain, water, sky, architecture, acropolis, aqueducts, statues, ruins, trees, flora, city and props. Each agent rendered its work, compared it against the references and fixed it in a loop.
-3. Further rounds of director, look-dev and module agents tightened composition, colour, detail density and waterfalls, using side-by-side comparisons and colour statistics against every reference.
-4. The final video was rendered frame by frame (8 or 4 samples per frame with motion blur), cut with crossfades and scored.
-
-## Running it
+需要 Node.js 18+ 和 Chrome / Edge（推荐独立显卡）。
 
 ```bash
+git clone https://github.com/Liyucheng1997/trials-of-athena.git
+cd trials-of-athena
 npm install
-node tools/serve.mjs
+node tools/bake.mjs terrain     # 烘焙地形网格，只需一次（约 10 秒）
+node tools/bake.mjs statues     # 可选：烘焙雕像，加快加载
+node tools/bake.mjs head        # 可选：烘焙巨石头像
+npm run game
 ```
 
-Then open `http://localhost:8080/?shot=1&quality=preview`. Keys 1-9 switch shots and the mouse orbits.
+打开 http://localhost:8080/ ，等进度条走完（首次 15–60 秒），点「开始冒险」。
 
-Heavy geometry (terrain meshes, statues, the giant head) is not committed. The first load builds it at runtime, which is slow. To bake it once:
+## 玩法
 
-```bash
-node tools/bake.mjs terrain
-node tools/bake.mjs statues
-node tools/bake.mjs head
-```
+- **自由探索**：走向任何墙壁、悬崖、神殿即可攀爬；从高处跃下、空中再按空格展开滑翔翼；可以游泳。攀爬、滑翔、冲刺、游泳都消耗体力。
+- **战斗**：三段剑击连招、长按蓄力回旋斩、举盾防御（受击瞬间举盾 = 完美防御）、翻滚闪避、锁定目标。
+- **敌人**：龙牙骷髅兵与骷髅队长、卡吕冬野猪、鹰身女妖，以及最终 Boss 米诺陶洛斯。
+- **剧情**：神谕女祭司皮提亚请你寻回雅典娜的三件圣物：智慧之羽、橄榄圣枝、神盾碎片，供奉在卫城祭坛上重燃圣火。
+- **收集**：打碎陶罐、击败怪物获得德拉克马，在码头商人处购买药水、心之容器、体力之瓶；野外藏有宝箱。
 
-Rendering stills and video needs Chrome or Edge:
+| 按键 | 作用 |
+|---|---|
+| WASD / Shift | 移动 / 冲刺 |
+| 鼠标 / 滚轮 | 视角 / 缩放 |
+| 空格 | 跳跃；空中 = 滑翔 |
+| 左键 | 攻击（长按 = 回旋斩） |
+| 右键 | 举盾 |
+| Ctrl / C | 翻滚；攀爬时松手 |
+| Q | 锁定 |
+| E | 互动 |
+| R | 喝药 |
+| M / Esc | 地图 / 暂停 |
 
-```bash
-node tools/render.mjs --shot 1 --quality high --spp 16 --w 3840 --h 2160
-node tools/render-video.mjs --w 1920 --h 1080 --spp 8 --quality high
-```
+完整说明、代码结构与实时渲染优化见 [GAME.md](GAME.md)。
 
-## Credits
+## 原版场景
 
-Built with Claude Code (Claude Opus 5.5) and [three.js](https://threejs.org).
+原 Athenaion 的离线渲染与场景查看器仍然完整保留：http://localhost:8080/index.html?shot=1 ，说明见 [ATHENAION.md](ATHENAION.md)。
 
-Music in the showcase video: "Ascending the Vale" by Kevin MacLeod (incompetech.com), licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/). The music is not part of this repository.
+## 致谢与协议
 
-MIT licensed.
+- 世界与渲染引擎：[Athenaion](https://github.com/Leonxlnx/athenaion) by Leonxlnx，由 Claude Code 构建，MIT 协议。
+- 游戏层（`src/game/`、`game.html`）及为实时运行所做的引擎改动：Yucheng Li，由 Claude Code 协助开发。
+- 基于 [three.js](https://threejs.org)。
+
+MIT License，见 [LICENSE](LICENSE)。

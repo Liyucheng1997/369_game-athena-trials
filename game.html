@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>雅典娜之试炼 · Trials of Athena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #0d0f12; overflow: hidden; }
+    canvas { display: block; }
+    body.interactive canvas { width: 100vw; height: 100vh; object-fit: cover; }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "/node_modules/three/build/three.module.js",
+        "three/addons/": "/node_modules/three/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <script type="module" src="/src/game/main.js"></script>
+</body>
+</html>

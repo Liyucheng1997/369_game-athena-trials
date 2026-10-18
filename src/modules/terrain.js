@@ -20,7 +20,7 @@ import { WEST_CRAG, HILLTOPS, MOUNT_NOTCH } from '../world/heightfield.js';
 export async function buildTerrain(engine, { shots = SHOTS } = {}) {
   const t0 = performance.now();
   const q = engine.quality;
-  const qname = q.terrainRes >= 1 ? 'high' : 'preview';
+  const qname = q.terrainMesh || (q.terrainRes >= 1 ? 'high' : 'preview');
   const planOpts = PLAN_OPTS(qname);
   // eroded far field (mountains): registered for heightAt() and uploaded as a texture for shading
   let far = null;

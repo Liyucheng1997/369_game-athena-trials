@@ -19,7 +19,7 @@ export const MODULE_ORDER = [
   'birds',        // seagulls
 ];
 
-export async function buildWorld(engine) {
+export async function buildWorld(engine, onProgress) {
   const skip = (engine.params.get('skip') || '').split(',').filter(Boolean);
   const only = (engine.params.get('only') || '').split(',').filter(Boolean);
   for (const name of MODULE_ORDER) {
@@ -33,6 +33,8 @@ export async function buildWorld(engine) {
       continue;
     }
     if (typeof mod.build !== 'function') continue;
+    onProgress?.(name, MODULE_ORDER.indexOf(name) / MODULE_ORDER.length);
+    await new Promise((r) => setTimeout(r, 0)); // let the loading screen repaint
     const t0 = performance.now();
     const before = new Set(engine.scene.children);
     try {

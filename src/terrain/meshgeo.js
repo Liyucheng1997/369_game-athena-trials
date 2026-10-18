@@ -2,7 +2,10 @@
 import * as THREE from 'three';
 
 /** LOD plan options per quality (part of the bake hash) */
-export const PLAN_OPTS = (qname) => ({ coarseFactor: qname === 'high' ? 1 : 2, K: 5.5, minCell: 1, nearMinCell: 0.5 });
+export const PLAN_OPTS = (qname) => qname === 'game'
+  // game: the hero walks everywhere in the playable area, so it gets ≤ 1.5 m cells (× coarseFactor) there
+  ? { coarseFactor: 1.5, K: 5.5, minCell: 1, nearMinCell: 0.5, areas: [[-160, -30, 620, 1.5], [-160, -30, 900, 4]] }
+  : { coarseFactor: qname === 'high' ? 1 : 2, K: 5.5, minCell: 1, nearMinCell: 0.5 };
 
 export function packedToGeometry(p) {
   const g = new THREE.BufferGeometry();

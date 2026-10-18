@@ -37,7 +37,7 @@ export async function bake() {
   const readText = async (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
   const nW = Math.max(1, Math.min(14, os.cpus().length - 1));
   const workers = Array.from({ length: nW }, () => new Worker(new URL('../terrain/nodeworker.mjs', import.meta.url), { workerData: { far } }));
-  for (const qname of ['preview', 'high']) {
+  for (const qname of ['preview', 'high', 'game']) {
     const planOpts = PLAN_OPTS(qname);
     const hash = await meshInputsHash(readText, qname, planOpts);
     const name = meshBakeName(qname, hash);

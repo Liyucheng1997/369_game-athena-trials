@@ -83,6 +83,11 @@ export function planChunks(shots, o = {}) {
     // never coarser than a ring-based fallback around the centre of the world (interactive viewing)
     const dc = Math.max(Math.abs(mx - (-300)) - size / 2, Math.abs(mz - 0) - size / 2, 0);
     best = Math.min(best, Math.max(4, dc * 0.012));
+    // optional areas [cx, cz, radius, maxCell] that must never be coarser than maxCell (game: playable area)
+    if (o.areas) for (const [ax, az, ar, ac] of o.areas) {
+      const ex = Math.max(x0 - ax, 0, ax - (x0 + size)), ez = Math.max(z0 - az, 0, az - (z0 + size));
+      if (ex * ex + ez * ez < ar * ar) best = Math.min(best, ac);
+    }
     let lim = minCell;
     for (const C of groundCams) {
       const dx = Math.max(x0 - C.p[0], 0, C.p[0] - (x0 + size)), dz = Math.max(z0 - C.p[2], 0, C.p[2] - (z0 + size));
