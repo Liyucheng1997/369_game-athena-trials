@@ -33,9 +33,9 @@ export async function buildTerrain(engine, { shots = SHOTS } = {}) {
   let packed = null, src = 'bake';
   let name = '';
   try {
-    const hash = await meshInputsHash((p) => fetch('/' + p, { cache: 'no-store' }).then((r) => r.text()), qname, planOpts);
+    const hash = await meshInputsHash((p) => fetch(p, { cache: 'no-store' }).then((r) => r.text()), qname, planOpts);
     name = meshBakeName(qname, hash);
-    const res = await fetch(`/generated/${name}.bin`, { cache: 'no-store' });
+    const res = await fetch(`generated/${name}.bin`, { cache: 'no-store' });
     if (res.ok) packed = geometryToPacked(deserializeGeometry(await res.arrayBuffer()));
   } catch (e) { /* fall through to runtime meshing */ }
   let nChunks = 0;

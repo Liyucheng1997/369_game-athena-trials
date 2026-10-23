@@ -1,0 +1,49 @@
+# 推送到 main 时自动部署到 GitHub Pages
+# 项目不需要构建：发布页面、源码、已入库的远山网格和 three.js（importmap 指向 ./node_modules/three）。
+# 其余烘焙网格（地形、雕像、头像）体积太大不上传，浏览器里找不到时会现场生成。
+# 在线入口：<站点>/game.html（游戏），<站点>/index.html（原版场景浏览）
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: 组装静态站点
+        run: |
+          mkdir -p _site/node_modules
+          cp -r game.html index.html src generated _site/
+          cp -r node_modules/three _site/node_modules/
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
